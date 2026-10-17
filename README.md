@@ -1,8 +1,8 @@
 # Spotify Dash
 
-A browser-based explorer for your entire Spotify Extended Streaming History. Import your JSON files to explore listening trends, favorites, discovery, daily rhythms, and individual playback records. No Spotify API key or login is needed.
+Explore your entire Spotify Extended Streaming History in a web browser or the native Android app. Import your JSON files to explore listening trends, favorites, discovery, daily rhythms, and individual playback records. No Spotify API key or login is needed.
 
-**Your imported history stays on your computer.** Parsing and analysis happen in a browser worker. The app remembers sanitized records in IndexedDB; IP addresses, usernames, and user-agent strings are discarded. Raw exports and imported datasets are excluded from the repository and production build. The optional demo is fictional. The screenshots in this README show the project owner's own listening history, shared as examples.
+**Your imported history stays on your device.** The web app processes data in a browser worker and remembers sanitized records in IndexedDB. Android processes and stores records locally in the app's private storage. Both discard IP addresses, usernames, and user-agent strings. Raw exports and imported datasets are excluded from the repository and production builds. The optional demo is fictional. Web screenshots show the project owner's listening history, shared as examples; Android screenshots use fictional demo data.
 
 ![Spotify Dash overview with date and device filters, listening statistics, and a monthly listening chart](docs/screenshots/overview.png)
 
@@ -15,11 +15,26 @@ Request **Extended streaming history** to explore the lifetime of your account. 
 3. Follow any confirmation prompts and check your account email for a request-confirmation message. Confirm the request if Spotify asks you to, and check spam or junk if the email is missing.
 4. Wait for Spotify's email saying the download is ready. Allow around **30 days** for preparation, as described in [Spotify's guidance](https://community.spotify.com/forum/en/discussion/7376480/song-historic-by-date-and-time).
 5. Download the ZIP and extract it. On Windows, right-click the ZIP and choose **Extract All**. Open the extracted **Spotify Extended Streaming History** folder.
-6. [Run Spotify Dash](#run-locally), then select all `Streaming_History_*.json` files, or drop the extracted folder into the import area. You can also import from **Data & methods** after opening the app.
+6. Open the [Android app](#android) or [run the web dashboard](#run-locally), then select all `Streaming_History_*.json` files or choose the extracted folder. The web app also accepts drag and drop. You can import from **Data & methods** after opening either app.
 
 Include every numbered/yearly part to cover the full export; audio and video files can be selected together. Import the extracted JSON files, not the ZIP or the included PDF. Keep the originals for your own backup. While waiting for the export, you can explore the app using its fictional demo.
 
 If the download option is missing or the request does not arrive, see Spotify's [data download help](https://support.spotify.com/us/article/data-rights-and-privacy-settings/) for support and contact options.
+
+## Android
+
+Install **Spotify Dash** through **Klobstore 0.1.5 or newer**, or download the signed APK from [GitHub Releases](https://github.com/xklob/spotify-dash/releases/latest). Requires Android 9 or newer.
+
+The native app includes all six sections, global filters, interactive charts, searchable rankings, playback details, and full filtered CSV export. Import JSON files or an extracted export folder through Android's file picker. It works offline and requests no network or broad storage permission. Each device keeps its own history; there is no account sync.
+
+See the [Android guide](android/README.md) for installation, features, build instructions and release signing.
+
+<p>
+  <img src="docs/screenshots/android-overview.png" width="280" alt="Native Android overview showing fictional demo statistics and six navigation tabs">
+  <img src="docs/screenshots/android-trends.png" width="280" alt="Native Android monthly trend chart with a selected month's values and artist composition controls">
+</p>
+
+The app uses native Kotlin and Jetpack Compose. [Validation results](android/VALIDATION.md) cover parity with the web calculations, a full archive import, Android file selection and CSV export, and emulator UI checks.
 
 ## Run locally
 
@@ -118,7 +133,7 @@ The source is Spotify's [Extended Streaming History schema](https://support.spot
 
 Timestamps record when playback **ended**, in UTC. All duration is assigned to that ending hour/day/month after timezone conversion; sessions crossing midnight are not split. Zero-filled calendar days mean no events in this export and selected population, not proof that you listened to nothing. Partial first/last years are marked. Historical travel timezones cannot be reconstructed from the export, so one chosen timezone applies to all years.
 
-Exact source records within the same audio/video category are deduplicated using a stable source-record fingerprint before personal fields are discarded. Records differing in source details are preserved. The fingerprint includes the timestamp plus two independent hashes; it is an identifier, not a security primitive. Invalid timestamps or non-finite/negative durations are excluded and counted. URI-less items are supported. Playback platform strings are grouped into broad device families; country codes reflect connection country, not an inferred home address.
+Exact source records within the same audio/video category are deduplicated using a stable source-record fingerprint before personal fields are discarded. Records differing in source details are preserved. The web app uses a timestamp plus two compact hashes; Android uses SHA-256. These identifiers serve duplicate detection. Invalid timestamps and non-integer, negative, or out-of-range durations are excluded and counted. URI-less items are supported. Playback platform strings are grouped into broad device families; country codes reflect connection country, not an inferred home address.
 
 Genre, BPM, danceability, mood, track release dates, and true track durations are absent from this export. The app does not invent them or infer completion percentages from playback duration.
 

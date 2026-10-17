@@ -14,3 +14,11 @@ Streaming_History_*.json
 StreamingHistory*.json
 *spotify*export*.zip
 *.pdf
+android/.gradle/
+android/.kotlin/
+android/**/build/
+android/local.properties
+**/signing.properties
+*.jks
+*.keystore
+*.p12
