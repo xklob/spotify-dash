@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.local-data/
+.private/
+*.log
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+playwright-report/
+test-results/
+coverage/
+Streaming_History_*.json
+StreamingHistory*.json
+*spotify*export*.zip
+*.pdf

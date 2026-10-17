@@ -1,0 +1,24 @@
+import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import { Analytics } from '../src/lib/analytics';
+import { DEFAULT_FILTERS } from '../src/lib/types';
+const ds = JSON.parse(await readFile('.local-data/history.json', 'utf8'));
+const a = new Analytics(ds);
+const started = performance.now();
+const result = a.query(DEFAULT_FILTERS);
+const elapsedMs = performance.now() - started;
+assert.equal(result.summary.events, ds.meta.events);
+assert.equal(result.summary.ms, ds.meta.totalMs);
+assert.equal(result.artists.reduce((s, r) => s + r.ms, 0), ds.meta.totalMs);
+assert.equal(result.tracks.reduce((s, r) => s + r.plays, 0), ds.meta.events);
+assert(Math.abs(result.monthly.reduce((s, p) => s + p.hours, 0) * 3600000 - ds.meta.totalMs) < 0.1);
+assert(Math.abs(result.daily.reduce((s, p) => s + p.hours, 0) * 3600000 - ds.meta.totalMs) < 0.1);
+assert(Math.abs(result.heatmap.reduce((s, p) => s + p.hours, 0) * 3600000 - ds.meta.totalMs) < 0.1);
+for (const [i, p] of result.composition.entries()) assert(Math.abs(result.compositionKeys.reduce((s, k) => s + Number(p[k]), 0) - result.monthly[i].hours) < 1e-8);
+const filtered = a.query({ ...DEFAULT_FILTERS, start: '2024-01-01', end: '2024-12-31', kind: 'music', minMs: 30000 });
+assert.equal(filtered.summary.events, a.history({ ...DEFAULT_FILTERS, start: '2024-01-01', end: '2024-12-31', kind: 'music', minMs: 30000 }).total);
+const summary = { elapsedMs, meta: ds.meta, summary: result.summary, yearly: result.yearly, filtered2024: filtered.summary,
+  topArtists: result.artists.slice(0, 5), correlation: result.correlation, distinctTitles: result.tracks.length, status: 'passed' };
+await mkdir('.private', { recursive: true });
+await writeFile('.private/validation.json', JSON.stringify(summary, null, 2));
+console.log(JSON.stringify({ status: 'passed', elapsedMs: Math.round(elapsedMs), events: result.summary.events, hours: result.summary.ms / 3600000, titles: result.summary.tracks, artistsAndShows: result.summary.artists, monthlyPoints: result.monthly.length, dailyPoints: result.daily.length, filtered2024Events: filtered.summary.events }, null, 2));
