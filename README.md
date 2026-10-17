@@ -2,7 +2,24 @@
 
 A browser-based explorer for your entire Spotify Extended Streaming History. Import your JSON files to explore listening trends, favorites, discovery, daily rhythms, and individual playback records. No Spotify API key or login is needed.
 
-**Your history stays on your computer.** Parsing and analysis happen in a browser worker. The app remembers sanitized records in IndexedDB; IP addresses, usernames, and user-agent strings are discarded. The public repository and production build contain no personal listening history. The optional demo is fictional.
+**Your imported history stays on your computer.** Parsing and analysis happen in a browser worker. The app remembers sanitized records in IndexedDB; IP addresses, usernames, and user-agent strings are discarded. Raw exports and imported datasets are excluded from the repository and production build. The optional demo is fictional. The screenshots in this README show the project owner's own listening history, shared as examples.
+
+![Spotify Dash overview with date and device filters, listening statistics, and a monthly listening chart](docs/screenshots/overview.png)
+
+## Get your extended streaming history
+
+Request **Extended streaming history** to explore the lifetime of your account. The separate **Account data** package includes only the past year's basic streaming history. Spotify explains the difference in [Understanding your data](https://support.spotify.com/us/article/understanding-your-data/).
+
+1. Sign in to your [Spotify Account Privacy page](https://www.spotify.com/account/privacy/) in a browser and find **Download your data**.
+2. Select **Extended streaming history** and submit the request. The other packages, **Account data** and **Technical log information**, are not needed for this dashboard.
+3. Follow any confirmation prompts and check your account email for a request-confirmation message. Confirm the request if Spotify asks you to, and check spam or junk if the email is missing.
+4. Wait for Spotify's email saying the download is ready. Allow around **30 days** for preparation, as described in [Spotify's guidance](https://community.spotify.com/forum/en/discussion/7376480/song-historic-by-date-and-time).
+5. Download the ZIP and extract it. On Windows, right-click the ZIP and choose **Extract All**. Open the extracted **Spotify Extended Streaming History** folder.
+6. [Run Spotify Dash](#run-locally), then select all `Streaming_History_*.json` files, or drop the extracted folder into the import area. You can also import from **Data & methods** after opening the app.
+
+Include every numbered/yearly part to cover the full export; audio and video files can be selected together. Import the extracted JSON files, not the ZIP or the included PDF. Keep the originals for your own backup. While waiting for the export, you can explore the app using its fictional demo.
+
+If the download option is missing or the request does not arrive, see Spotify's [data download help](https://support.spotify.com/us/article/data-rights-and-privacy-settings/) for support and contact options.
 
 ## Run locally
 
@@ -40,6 +57,45 @@ Clearing data in the app deletes its browser copy and disables automatic local l
 - **Data & methods:** import management, source coverage, duplicate accounting, and definitions.
 
 Date range, content type, minimum playback duration, search, artist, device, country, shuffle, and timezone filters apply across the app. The default timezone is America/New_York and can be changed. No Spotify requests are made unless you explicitly open a catalog link.
+
+## Screenshots
+
+Expand a view below for more examples, or click an image to see it at full size.
+
+<details>
+<summary>Artist mix over time and top favorites</summary>
+
+![Monthly listening time by artist, with top artist and title rankings beneath the chart](docs/screenshots/artist-trends.png)
+
+</details>
+
+<details>
+<summary>Listening highlights and streaks</summary>
+
+![Listening highlights showing the strongest day, longest streak, busiest month and year, new artists, and top artists' share](docs/screenshots/highlights.png)
+
+</details>
+
+<details>
+<summary>Artist and show rankings</summary>
+
+![Searchable artist and show rankings with listening time, event counts, skip rates, and first and last played dates](docs/screenshots/artist-rankings.png)
+
+</details>
+
+<details>
+<summary>Title rankings</summary>
+
+![Title rankings with track names, artists, listening time, playback statistics, and Spotify links](docs/screenshots/title-rankings.png)
+
+</details>
+
+<details>
+<summary>Album rankings</summary>
+
+![Album rankings sorted by listening time, with search and event-count sorting controls](docs/screenshots/album-rankings.png)
+
+</details>
 
 ## How the numbers work
 
