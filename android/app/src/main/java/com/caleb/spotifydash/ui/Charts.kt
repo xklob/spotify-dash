@@ -68,6 +68,7 @@ import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -655,6 +656,7 @@ fun DataTable(
     pageSize: Int = 25,
     stateKey: String = "",
     rowNote: ((Int) -> String?)? = null,
+    onRowClick: ((Int) -> Unit)? = null,
 ) {
     var page by rememberSaveable(stateKey, rowCount) { mutableIntStateOf(0) }
     val pages = max(1, ceil(rowCount / pageSize.toDouble()).toInt())
@@ -689,7 +691,10 @@ fun DataTable(
                     if (r > from) HorizontalDivider(color = Palette.Line, thickness = 1.dp)
                     val note = rowNote?.invoke(r)
                     val spoken = columns.indices.joinToString(", ") { c -> "${columns[c].label}: ${cell(r, c)}" } + (note?.let { ", $it" } ?: "")
-                    Row(Modifier.padding(vertical = 9.dp).clearAndSetSemantics { contentDescription = spoken }, verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.then(if (onRowClick == null) Modifier else Modifier.clickable { onRowClick(r) }).padding(vertical = 9.dp).clearAndSetSemantics {
+                        contentDescription = spoken
+                        if (onRowClick != null) onClick("Inspect track") { onRowClick(r); true }
+                    }, verticalAlignment = Alignment.CenterVertically) {
                         columns.forEachIndexed { c, col ->
                             Row(Modifier.width(col.width).padding(horizontal = 8.dp), horizontalArrangement = if (col.numeric) Arrangement.End else Arrangement.Start) {
                                 Text(

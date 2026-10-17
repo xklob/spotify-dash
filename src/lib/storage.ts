@@ -1,4 +1,5 @@
 import type { Dataset } from './types';
+import type { Metadata } from './metadata';
 const DATABASE = 'spotify-dash-v1';
 async function database(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -17,6 +18,16 @@ async function read<T>(key: string): Promise<T | undefined> {
   }); } finally { db.close(); }
 }
 export const readSaved = () => read<Dataset>('dataset');
+export const readMetadata = () => read<Metadata>('metadata');
+export async function saveMetadata(metadata: Metadata | null) {
+  const db = await database();
+  try { await new Promise<void>((resolve, reject) => {
+    const t = db.transaction('state', 'readwrite');
+    if (metadata) t.objectStore('state').put(metadata, 'metadata'); else t.objectStore('state').delete('metadata');
+    t.oncomplete = () => resolve(); t.onerror = () => reject(new Error('Could not save metadata in this browser.'));
+    t.onabort = () => reject(new Error('Metadata storage was interrupted.'));
+  }); } finally { db.close(); }
+}
 export const localDismissed = () => read<boolean>('localDismissed');
 export async function saveDataset(dataset: Dataset) {
   const db = await database();
@@ -28,7 +39,7 @@ export async function saveDataset(dataset: Dataset) {
 export async function deleteSaved() {
   const db = await database();
   try { await new Promise<void>((resolve, reject) => {
-    const t = db.transaction('state', 'readwrite'); const s = t.objectStore('state'); s.delete('dataset'); s.put(true, 'localDismissed');
+    const t = db.transaction('state', 'readwrite'); const s = t.objectStore('state'); s.delete('dataset'); s.delete('metadata'); s.put(true, 'localDismissed');
     t.oncomplete = () => resolve(); t.onerror = () => reject(t.error);
   }); } finally { db.close(); }
 }

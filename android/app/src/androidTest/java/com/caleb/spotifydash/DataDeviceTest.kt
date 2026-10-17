@@ -10,10 +10,34 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 import java.io.StringReader
+import com.google.gson.JsonParser
 
 @RunWith(AndroidJUnit4::class)
 class DataDeviceTest {
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
+
+    @Test fun fullMoodArchiveWhenExplicitlyStaged() {
+        assumeTrue("Opt-in full archive mood benchmark.", InstrumentationRegistry.getArguments().getString("moodArchive") == "true")
+        val started = System.currentTimeMillis(); val store = DatasetStore(context)
+        val data = requireNotNull(store.load()); val metadata = requireNotNull(store.loadMetadata())
+        val expected = File(context.filesDir, "qa-mood-expected.json").reader().use { JsonParser.parseReader(it).asJsonObject }
+        assertEquals(expected.get("allEvents").asInt, data.events.size)
+        val engine = Analytics(data); engine.query(Filters())
+        var summary: MoodBucket? = null
+        for (weight in listOf("time", "plays", "tracks")) {
+            val mood = engine.mood(Filters(), metadata, MoodOptions(weight = weight)); val s = mood.summary
+            summary = s
+            assertEquals(expected.get("musicEvents").asInt, s.plays); assertEquals(expected.get("musicMs").asLong, s.ms)
+            assertEquals(expected.get("coveredMs").asLong, s.coveredMs); assertEquals(expected.get("coveredTracks").asInt, s.coveredTracks)
+            val values = expected.getAsJsonObject("means").getAsJsonObject(weight)
+            assertEquals(values.get("energy").asDouble, s.values.energy!!, 1e-9)
+            assertEquals(values.get("valence").asDouble, s.values.valence!!, 1e-9)
+            assertEquals(s.ms, mood.heatmap.sumOf { it.ms }); assertEquals(s.coveredMs, mood.distribution.sumOf { it.ms })
+            assertEquals(s.ms, mood.years.sumOf { it.ms }); assertEquals(s.ms, mood.periods.sumOf { it.ms })
+        }
+        val report = File(context.getExternalFilesDir(null), "qa-mood-report.txt")
+        report.writeText("status=passed\nevents=${data.events.size}\nmetadata=${metadata.tracks.size}\ncoveredTracks=${summary!!.coveredTracks}\ncoveredMs=${summary.coveredMs}\nelapsedMs=${System.currentTimeMillis()-started}\nmaxHeapBytes=${Runtime.getRuntime().maxMemory()}\nusedHeapBytes=${Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()}\n")
+    }
 
     @Test fun fictionalAssetAndNativeStorageRoundTrip() {
         // Use a disposable cache file, preserving any imported app data.

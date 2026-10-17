@@ -1,0 +1,134 @@
+{
+  "format": "spotify-dash-metadata",
+  "version": 1,
+  "provider": "reccobeats",
+  "modelVersion": null,
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "tracks": [
+    {
+      "uri": "spotify:track:AAAAAAAAAAAAAAAAAAAAAA",
+      "status": "found",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "providerId": "fixture-A",
+      "title": "Fictional A",
+      "artists": [
+        "Test Artist"
+      ],
+      "durationMs": 240000,
+      "isrc": "",
+      "key": null,
+      "mode": null,
+      "features": {
+        "energy": 0,
+        "valence": 0.2,
+        "danceability": null,
+        "acousticness": null,
+        "instrumentalness": null,
+        "speechiness": null,
+        "liveness": null,
+        "tempo": 120,
+        "loudness": null
+      }
+    },
+    {
+      "uri": "spotify:track:BBBBBBBBBBBBBBBBBBBBBB",
+      "status": "found",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "providerId": "fixture-B",
+      "title": "Fictional B",
+      "artists": [
+        "Test Artist"
+      ],
+      "durationMs": 240000,
+      "isrc": "",
+      "key": null,
+      "mode": null,
+      "features": {
+        "energy": 1,
+        "valence": 0.8,
+        "danceability": null,
+        "acousticness": null,
+        "instrumentalness": null,
+        "speechiness": null,
+        "liveness": null,
+        "tempo": 140,
+        "loudness": null
+      }
+    },
+    {
+      "uri": "spotify:track:CCCCCCCCCCCCCCCCCCCCCC",
+      "status": "missing",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "providerId": "fixture-C",
+      "title": "Fictional C",
+      "artists": [
+        "Test Artist"
+      ],
+      "durationMs": 240000,
+      "isrc": "",
+      "key": null,
+      "mode": null,
+      "features": {
+        "energy": null,
+        "valence": null,
+        "danceability": null,
+        "acousticness": null,
+        "instrumentalness": null,
+        "speechiness": null,
+        "liveness": null,
+        "tempo": null,
+        "loudness": null
+      }
+    },
+    {
+      "uri": "spotify:track:DDDDDDDDDDDDDDDDDDDDDD",
+      "status": "found",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "providerId": "fixture-D",
+      "title": "Fictional D",
+      "artists": [
+        "Test Artist"
+      ],
+      "durationMs": 240000,
+      "isrc": "",
+      "key": null,
+      "mode": null,
+      "features": {
+        "energy": 0.9,
+        "valence": null,
+        "danceability": null,
+        "acousticness": null,
+        "instrumentalness": null,
+        "speechiness": null,
+        "liveness": null,
+        "tempo": 100,
+        "loudness": null
+      }
+    },
+    {
+      "uri": "spotify:track:EEEEEEEEEEEEEEEEEEEEEE",
+      "status": "found",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "providerId": "fixture-E",
+      "title": "Fictional E",
+      "artists": [
+        "Test Artist"
+      ],
+      "durationMs": 240000,
+      "isrc": "",
+      "key": null,
+      "mode": null,
+      "features": {
+        "energy": 0.2,
+        "valence": 0.4,
+        "danceability": null,
+        "acousticness": null,
+        "instrumentalness": null,
+        "speechiness": null,
+        "liveness": null,
+        "tempo": 80,
+        "loudness": null
+      }
+    }
+  ]
+}

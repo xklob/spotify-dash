@@ -1,14 +1,15 @@
-import { Clock3, Database, Heart, History, LayoutDashboard, Lock, Sparkles, type LucideIcon } from 'lucide-react';
+import { Clock3, Database, Heart, History, LayoutDashboard, Lock, Sparkles, Activity, type LucideIcon } from 'lucide-react';
 import type { DatasetMeta } from '../lib/types';
 import { fmtInt, fmtMonth, isoToYmd, plural } from './format';
 import { Wordmark } from './ui';
 
-export type TabId = 'overview' | 'favorites' | 'habits' | 'discoveries' | 'history' | 'data';
+export type TabId = 'overview' | 'favorites' | 'habits' | 'discoveries' | 'mood' | 'history' | 'data';
 export const TABS: { id: TabId; label: string; icon: LucideIcon }[] = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'favorites', label: 'Favorites', icon: Heart },
   { id: 'habits', label: 'Habits', icon: Clock3 },
   { id: 'discoveries', label: 'Discoveries', icon: Sparkles },
+  { id: 'mood', label: 'Mood & energy', icon: Activity },
   { id: 'history', label: 'History', icon: History },
   { id: 'data', label: 'Data & methods', icon: Database },
 ];

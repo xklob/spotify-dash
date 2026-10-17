@@ -33,6 +33,12 @@ class DashboardUiTest {
     private fun scrollTo(text: String) {
         compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText(text))
     }
+    private fun navigate(destination: String) {
+        if (destination in listOf("Habits", "Discoveries", "Data & methods")) {
+            compose.onNodeWithContentDescription("More sections").activate()
+            compose.onNodeWithText(destination).activate()
+        } else compose.onNodeWithContentDescription(destination).activate()
+    }
 
     @Test fun demoNavigationGlobalFiltersPaginationAndConfirmedDeletionSurviveRecreation() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -44,8 +50,8 @@ class DashboardUiTest {
             compose.onNodeWithText("Explore the fictional demo").activate()
             waitForText("Fictional demo data")
 
-            for (destination in listOf("Favorites", "Habits", "Discoveries", "History", "Data & methods", "Overview")) {
-                compose.onNodeWithContentDescription(destination).activate()
+            for (destination in listOf("Favorites", "Habits", "Discoveries", "Mood & energy", "History", "Data & methods", "Overview")) {
+                navigate(destination)
                 waitForText(destination)
             }
 
@@ -61,6 +67,7 @@ class DashboardUiTest {
             scrollTo("Reset filters")
             compose.onNodeWithText("Reset filters").activate()
             compose.waitUntil(30_000) { store.loadFilters().search.isEmpty() }
+            compose.waitUntil(30_000) { compose.onAllNodesWithText("No listening matches these filters").fetchSemanticsNodes().isEmpty() }
             scrollTo("Export all 11,583 as CSV")
             compose.onNodeWithText("Export all 11,583 as CSV").assertIsEnabled()
             scrollTo("Page 1 of 232")
@@ -72,7 +79,7 @@ class DashboardUiTest {
             compose.onNodeWithText("Showing 11,551 to 11,583 of 11,583").assertIsDisplayed()
             assertEquals("demo", store.load()!!.meta.source)
 
-            compose.onNodeWithContentDescription("Data & methods").activate()
+            navigate("Data & methods")
             scrollTo("Delete saved history")
             compose.onNodeWithText("Delete saved history").activate()
             waitForText("Delete the saved history?")

@@ -15,7 +15,7 @@ const METHODS: [string, string][] = [
   ['New and familiar', 'New means the first appearance anywhere in the imported data, not the first time you ever heard it. Familiar listening is the share of time on titles first recorded on an earlier calendar day; first-seen dates always come from the full import.'],
   ['Yearly overlap', 'Jaccard overlap of consecutive years\' top 20 artists or shows by time: names in both lists divided by names in either. Partial years are flagged.'],
   ['Returns and correlation', 'Longest returns are gaps of 180 days or more between consecutive positive-length records of a title, within the filtered records. The daily scatter reports Pearson r and its n across active days; it describes association, not cause.'],
-  ['Not in the export', 'Genre, tempo, mood, and audio features are absent from Spotify\'s history files. The app does not fetch or infer them.'],
+  ['Catalog enrichment', 'Tempo, musical mood, and audio features are absent from Spotify\'s history files. Mood & energy can optionally fetch ReccoBeats estimates by exact track ID, or import a portable metadata file. Missing scores stay unknown; coverage and retrieval dates are shown. These describe the music, not your emotional state. Genre and release dates are not enriched in this version.'],
 ];
 
 export function DataView({ meta, timezone, busy, onPick, onDemo, onClear }: {
@@ -65,6 +65,7 @@ export function DataView({ meta, timezone, busy, onPick, onDemo, onClear }: {
             <li>Files are parsed by a background worker in this browser and never uploaded.</li>
             <li>IP addresses, usernames, and user agents are discarded during import.</li>
             <li>The sanitized history stays in this browser&apos;s IndexedDB until you delete it here.</li>
+            <li>Optional catalog fetching sends track IDs to ReccoBeats, without listening timestamps or counts. Cached metadata stays in this browser and is removed with the browser copy. Local audio files are never used.</li>
             <li>When run locally after <code>npm run import</code>, the prepared <code>.local-data/history.json</code> loads on first launch. Deleting the browser copy leaves that file and your Spotify download untouched.</li>
           </ul>
           <div className="manage-actions">

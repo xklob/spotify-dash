@@ -54,6 +54,7 @@ private val PrivacyPoints = listOf(
     "Your files are read on this device and never uploaded. Spotify Dash has no internet access at all.",
     "IP addresses, usernames, and device details are discarded while importing.",
     "The cleaned history stays in this app's private storage, outside device backups, until you delete it.",
+    "Imported catalog metadata is also stored privately and cleared with your history. No local audio files are used.",
     "Spotify opens only when you tap a Spotify link, in its own app or your browser.",
 )
 
@@ -76,7 +77,7 @@ private val Methods = listOf(
     "Date ranges" to "Recent ranges such as Last 365 days end at the last imported day, not today. Partial first and last months are noted in charts and tables.",
     "Duplicates and invalid records" to "Exact copies of a source record within the audio or video history are kept once, across files and repeated imports. Records that differ in any detail stay separate. Records with invalid timestamps or impossible durations are skipped and counted. Items without a Spotify URI are still included.",
     "Devices and countries" to "Platform strings are grouped into broad device families. Country is the connection country Spotify recorded, not a home address.",
-    "Not in the export" to "Genre, tempo (BPM), danceability, mood, release dates, and true track lengths are absent from Spotify's history files. The app does not invent them or guess completion percentages from playback time.",
+    "Catalog enrichment" to "Tempo (BPM), musical mood, audio features, and full track durations are absent from Spotify's history files. Mood & energy can import ReccoBeats catalog estimates exported by the web dashboard. Exact track IDs join the scores; missing values stay unknown and coverage is shown. These describe the music, not your emotional state. Genre and release dates are not enriched in this version.",
 )
 
 @OptIn(ExperimentalLayoutApi::class)

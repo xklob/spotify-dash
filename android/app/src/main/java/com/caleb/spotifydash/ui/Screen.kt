@@ -15,6 +15,7 @@ import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Storage
+import androidx.compose.material.icons.rounded.Insights
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -23,12 +24,14 @@ import androidx.compose.ui.unit.dp
 import com.caleb.spotifydash.DashboardState
 import com.caleb.spotifydash.core.Filters
 import com.caleb.spotifydash.core.QueryResult
+import com.caleb.spotifydash.core.MoodOptions
 
 enum class Destination(val title: String, val short: String, val icon: ImageVector) {
     Overview("Overview", "Overview", Icons.Rounded.Dashboard),
     Favorites("Favorites", "Favorites", Icons.Rounded.FavoriteBorder),
     Habits("Habits", "Habits", Icons.Rounded.Schedule),
     Discoveries("Discoveries", "Discover", Icons.Rounded.AutoAwesome),
+    Mood("Mood & energy", "Mood", Icons.Rounded.Insights),
     History("History", "History", Icons.Rounded.History),
     Data("Data & methods", "Data", Icons.Rounded.Storage),
 }
@@ -46,6 +49,9 @@ class DashActions(
     val requestClear: () -> Unit,
     val exportCsv: () -> Unit,
     val loadHistory: (page: Int, order: String) -> Unit,
+    val pickMetadata: () -> Unit,
+    val exportMetadata: () -> Unit,
+    val moodOptions: (MoodOptions) -> Unit,
 )
 
 /** Shared inputs for the analysis screens. */

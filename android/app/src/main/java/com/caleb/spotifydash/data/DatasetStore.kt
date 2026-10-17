@@ -5,6 +5,8 @@ import android.util.AtomicFile
 import com.caleb.spotifydash.core.Dataset
 import com.caleb.spotifydash.core.DatasetCodec
 import com.caleb.spotifydash.core.Filters
+import com.caleb.spotifydash.core.Metadata
+import com.caleb.spotifydash.core.MetadataCodec
 import com.caleb.spotifydash.core.validateFilters
 import org.json.JSONObject
 import java.io.File
@@ -13,6 +15,7 @@ import java.util.zip.GZIPOutputStream
 
 class DatasetStore(private val context: Context) {
     private val file = AtomicFile(File(context.filesDir, "history.json.gz"))
+    private val catalog = AtomicFile(File(context.filesDir, "metadata.json.gz"))
     private val preferences = context.getSharedPreferences("dashboard", Context.MODE_PRIVATE)
     fun load(): Dataset? {
         if (!file.baseFile.exists()) return null
@@ -28,7 +31,16 @@ class DatasetStore(private val context: Context) {
             file.finishWrite(stream)
         } catch (e: Exception) { file.failWrite(stream); throw e }
     }
-    fun clear() { file.delete(); preferences.edit().clear().commit() }
+    fun loadMetadata(): Metadata? = if (!catalog.baseFile.exists()) null else catalog.openRead().use { GZIPInputStream(it).bufferedReader().use(MetadataCodec::read) }
+    fun saveMetadata(metadata: Metadata?) {
+        if (metadata == null) { catalog.delete(); return }
+        val stream = catalog.startWrite()
+        try {
+            val gzip = GZIPOutputStream(stream); val writer = gzip.bufferedWriter()
+            MetadataCodec.write(metadata, writer); writer.flush(); gzip.finish(); gzip.flush(); catalog.finishWrite(stream)
+        } catch (e: Exception) { catalog.failWrite(stream); throw e }
+    }
+    fun clear() { file.delete(); catalog.delete(); preferences.edit().clear().commit() }
     // aapt transparently expands assets ending in .gz and drops that suffix.
     // Keep an explicit .gzip suffix so the stored bytes have a stable format.
     fun demo(): Dataset = context.assets.open("demo.json.gzip").use { GZIPInputStream(it).bufferedReader().use(DatasetCodec::read) }

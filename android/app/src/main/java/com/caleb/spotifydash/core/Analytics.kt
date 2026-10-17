@@ -22,8 +22,8 @@ fun pearson(points: List<Pair<Double, Double>>): Double? {
     return if (xx == 0.0 || yy == 0.0) null else (xy / sqrt(xx * yy)).coerceIn(-1.0, 1.0)
 }
 
-private data class Prepared(val e: HistoryEvent, val date: String, val time: String, val month: String, val year: String,
-    val hour: Int, val day: Int, val item: String, val search: String)
+private data class Prepared(override val e: HistoryEvent, override val date: String, val time: String, val month: String, val year: String,
+    override val hour: Int, override val day: Int, override val item: String, val search: String) : MoodInput
 private class Bucket(private val detailed: Boolean = false, private val mix: Boolean = false) {
     var ms = 0L; var plays = 0; var skipped = 0; var known = 0; var familiarMs = 0L
     val artists = HashSet<String>(); val items = HashSet<String>(); val newArtists = HashSet<String>()
@@ -96,6 +96,15 @@ class Analytics(val dataset: Dataset) {
     }
 
     @Synchronized fun all(f: Filters): List<HistoryRow> = select(f).map { HistoryRow(it.e, it.date, it.time) }
+
+    @Synchronized fun mood(f: Filters, metadata: Metadata, options: MoodOptions): MoodResult {
+        val selected = select(f)
+        val start = f.start.ifEmpty { prepared.first().date }; val end = f.end.ifEmpty { prepared.last().date }
+        require(LocalDate.parse(end).toEpochDay() - LocalDate.parse(start).toEpochDay() <= 36500) { "Choose a date range shorter than 100 years." }
+        val cached = metadata.tracks.mapTo(HashSet()) { it.uri }
+        val pending = if (metadata.provider == "demo") 0 else dataset.events.asSequence().filter { it.kind == "music" && trackUri.matches(it.uri) }.map { it.uri }.filter { it !in cached }.distinct().count()
+        return analyzeMood(selected, firstItem, metadata, options, start, end, pending)
+    }
 
     @Synchronized fun query(f: Filters): QueryResult {
         val selected = select(f)

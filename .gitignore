@@ -12,6 +12,7 @@ test-results/
 coverage/
 Streaming_History_*.json
 StreamingHistory*.json
+spotify-dash-metadata*.json
 *spotify*export*.zip
 *.pdf
 android/.gradle/

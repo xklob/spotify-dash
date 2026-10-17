@@ -719,3 +719,31 @@ label.btn:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; 
 @media (forced-colors: active) {
   .heat-cell, .cal-cell, .bar-track span, .compare-bar span, .swatch { forced-color-adjust: none; }
 }
+
+/* Mood and catalog enrichment */
+.mood-tools { padding: 20px; display: grid; gap: 12px; }
+.mood-tools p { max-width: 80ch; margin: 6px 0; }
+.mood-actions, .mood-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.mood-manager-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.mood-drill { max-width: 370px; margin-top: 14px; }
+.mood-checkbox { display: inline-flex; gap: 8px; align-items: center; white-space: nowrap; font-size: 12px; }
+.mood-checkbox input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; margin: 0; padding: 0; accent-color: #c3f04a; }
+.mood-grid-frame { max-width: 360px; margin: auto; }
+.mood-density { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
+.mood-density button { aspect-ratio: 1; border: 1px solid #393a30; border-radius: 3px; cursor: pointer; min-width: 0; }
+.mood-axis-label { display: block; margin: 7px 0; color: var(--muted, #aaa59a); font-size: 12px; }
+.mood-hour-scroll { overflow-x: auto; }
+.mood-hour-grid { display: grid; grid-template-columns: 40px repeat(24, minmax(16px, 1fr)); gap: 4px; min-width: 590px; font-size: 11px; color: #aaa59a; }
+.mood-hour-row { display: contents; }
+.mood-hour-row > span { display: flex; align-items: center; }
+.mood-hour-row button { min-height: 28px; border: 1px solid #393a30; border-radius: 3px; cursor: pointer; }
+.mood-feature { display: grid; grid-template-columns: 1fr auto; padding: 10px 0; border-bottom: 1px solid #30302a; gap: 3px 12px; }
+.mood-feature small { grid-column: 1 / -1; color: #aaa59a; }
+.mood-comparison { display: grid; gap: 8px; padding: 18px 0; border-bottom: 1px solid #30302a; }
+.mood-comparison span, .mood-comparison small { color: #aaa59a; }
+.mood-coverage { display: grid; gap: 12px; }
+.mood-coverage > div { display: grid; grid-template-columns: 42px 1fr 60px 130px; align-items: center; gap: 10px; }
+.mood-coverage progress { width: 100%; accent-color: #c3f04a; height: 10px; }
+.mood-coverage small { color: #aaa59a; text-align: right; }
+.mood-view .stat { background: #171716; border: 1px solid #30302a; border-radius: 14px; padding: 20px; }
+@media (max-width: 600px) { .mood-coverage > div { grid-template-columns: 36px 1fr 50px; } .mood-coverage small { grid-column: 2 / -1; } .mood-actions .btn { flex: 1 1 auto; } }

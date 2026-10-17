@@ -1,8 +1,8 @@
 # Spotify Dash
 
-Explore your entire Spotify Extended Streaming History in a web browser or the native Android app. Import your JSON files to explore listening trends, favorites, discovery, daily rhythms, and individual playback records. No Spotify API key or login is needed.
+Explore your entire Spotify Extended Streaming History in a web browser or the native Android app. Import your JSON files to explore listening trends, favorites, discovery, musical mood and energy, daily rhythms, and individual playback records. No Spotify API key or login is needed.
 
-**Your imported history stays on your device.** The web app processes data in a browser worker and remembers sanitized records in IndexedDB. Android processes and stores records locally in the app's private storage. Both discard IP addresses, usernames, and user-agent strings. Raw exports and imported datasets are excluded from the repository and production builds. The optional demo is fictional. Web screenshots show the project owner's listening history, shared as examples; Android screenshots use fictional demo data.
+**Your imported history stays on your device.** The web app processes data in a browser worker and remembers sanitized records in IndexedDB. Android processes and stores records locally in the app's private storage. Both discard IP addresses, usernames, and user-agent strings. Optional catalog fetching sends distinct Spotify track IDs to ReccoBeats; it does not send listening timestamps, counts, or history files. No local audio files are read, uploaded, or analyzed. Raw exports and imported datasets are excluded from the repository and production builds. The optional demo is fictional. The original web screenshots show the project owner's listening history, shared as examples; Mood & energy and Android screenshots use fictional demo data.
 
 ![Spotify Dash overview with date and device filters, listening statistics, and a monthly listening chart](docs/screenshots/overview.png)
 
@@ -25,13 +25,14 @@ If the download option is missing or the request does not arrive, see Spotify's 
 
 Install **Spotify Dash** through **Klobstore 0.1.5 or newer**, or download the signed APK from [GitHub Releases](https://github.com/xklob/spotify-dash/releases/latest). Requires Android 9 or newer.
 
-The native app includes all six sections, global filters, interactive charts, searchable rankings, playback details, and full filtered CSV export. Import JSON files or an extracted export folder through Android's file picker. It works offline and requests no network or broad storage permission. Each device keeps its own history; there is no account sync.
+The native app includes all seven sections, global filters, interactive charts, searchable rankings, playback details, and full filtered CSV export. Import JSON files or an extracted export folder through Android's file picker. It works offline and requests no network or broad storage permission. Import the portable catalog metadata file to unlock Mood & energy. Each device keeps its own history; there is no account sync. On phones, Habits, Discoveries, and Data & methods are under **More**.
 
 See the [Android guide](android/README.md) for installation, features, build instructions and release signing.
 
 <p>
-  <img src="docs/screenshots/android-overview.png" width="280" alt="Native Android overview showing fictional demo statistics and six navigation tabs">
+  <img src="docs/screenshots/android-overview.png" width="280" alt="Native Android overview showing fictional demo statistics">
   <img src="docs/screenshots/android-trends.png" width="280" alt="Native Android monthly trend chart with a selected month's values and artist composition controls">
+  <img src="docs/screenshots/android-mood.png" width="280" alt="Native Android energy and valence trends with a selected month's scores and catalog coverage, using fictional demo data">
 </p>
 
 The app uses native Kotlin and Jetpack Compose. [Validation results](android/VALIDATION.md) cover parity with the web calculations, a full archive import, Android file selection and CSV export, and emulator UI checks.
@@ -68,14 +69,58 @@ Clearing data in the app deletes its browser copy and disables automatic local l
 - **Favorites:** artists/shows, titles, and albums; sort by listening time or event count, search the full rankings, and drill into an artist.
 - **Habits:** weekday and hourly patterns, activity calendar, devices, countries, playback endings, and skip rates with shuffle on/off.
 - **Discoveries:** first-seen artists, familiar listening share, yearly comparisons, repeat obsessions, rediscoveries, and a daily listening correlation.
+- **Mood & energy:** weekly/monthly trends, three-period smoothing, a two-dimensional mood distribution, weekday/hour patterns, earlier/later comparisons, sound texture, skip/repeat associations, annual coverage, and track metadata.
 - **History:** searchable, paginated playback records with Spotify links and CSV export of the full filtered population.
 - **Data & methods:** import management, source coverage, duplicate accounting, and definitions.
 
-Date range, content type, minimum playback duration, search, artist, device, country, shuffle, and timezone filters apply across the app. The default timezone is America/New_York and can be changed. No Spotify requests are made unless you explicitly open a catalog link.
+Date range, content type, minimum playback duration, search, artist, device, country, shuffle, and timezone filters apply across the app. Mood analyses use music records within those filters. The default timezone is America/New_York and can be changed. No Spotify requests are made unless you explicitly open a catalog link. ReccoBeats requests happen only when you choose **Fetch next tracks** or run the enrichment command.
+
+## Add musical mood and catalog metadata
+
+1. Import your listening history into the web dashboard and open **Mood & energy**.
+2. Choose **Fetch next … tracks** to look up up to 400 unchecked track IDs. Frequent listening is prioritized. Each completed batch is saved, and **Stop after this batch** leaves it ready to resume. A catalog failure preserves completed batches and existing history.
+3. Open **Manage metadata → Export for Android** to save `spotify-dash-metadata.json`.
+4. Transfer that JSON file to Android, open **Mood & energy → Import metadata**, and select it. Use **Manage** to reopen those actions after metadata is loaded. Android uses the same calculations entirely offline. Either app can import/export this portable format.
+
+For a large archive, the desktop command can enrich every ID and resume from its cache:
+
+```sh
+npm run import -- "/path/to/Spotify Extended Streaming History"
+npm run enrich
+```
+
+The default input is `.local-data/history.json`; the output is `.local-data/metadata.json`. Reload the local dashboard to load completed metadata batches. You can also import this file directly on Android. Options include `--limit 500`, `--pilot` for a sample across listening years, `--refresh-missing` to retry IDs without both mood scores, and `--input`/`--output` for other paths. `Ctrl+C` finishes the current batch before stopping. Existing successful cache entries are reused; requests are paced, and rate limits respect `Retry-After`. An unsuccessful HTTP response is never cached as a missing track.
+
+[ReccoBeats](https://reccobeats.com/docs/documentation/introduction) supplies third-party musical estimates: energy, valence, danceability, acousticness, instrumentalness, speechiness, liveness, tempo, loudness, and musical key/mode when available. Its catalog can also add full duration, ISRC, and credited artist names. Its [terms](https://reccobeats.com/docs/documentation/terms-of-service) distinguish Spotify-derived catalog metadata from ReccoBeats' own feature estimates; these are **not Spotify Audio Features API scores**. The provider does not publish a model revision or guarantee accuracy or complete coverage.
+
+Only exact Spotify track IDs are joined. Missing entries remain unknown. Different releases/remixes keep separate IDs even when an ISRC or title matches. Each record retains its source, retrieval date, provider ID, and available scores; original history is unchanged. Exported metadata contains a list of track IDs and catalog names, so keep it private if you do not want to share your music choices. Do not commit your personal metadata file or publish it with the app.
+
+| Mood measurement | Definition |
+| --- | --- |
+| Energy / valence | Provider estimates on a 0–1 scale. Energy describes intensity; valence describes positive musical tone. These do not measure the listener's emotions or mental health. Both scores must be present for a track to enter these paired analyses. |
+| Weighting | Default: actual milliseconds played. Alternatives: one vote per event, or one vote per distinct track ID within each bucket. Zero-time events contribute only to event/track weighting. |
+| Coverage | Scored music milliseconds / all selected music milliseconds. Scored and total event/track counts accompany it. Each other feature shows its own time coverage. A zero denominator is unknown. |
+| Smoothing | Recalculate from the current and previous two calendar buckets, including gaps. Distinct tracks are deduplicated across the whole three-bucket window. |
+| Mood distribution | All paired scores grouped into 0.1-wide energy/valence bins; cell weight follows the selected weighting. It is not a sample of top tracks. |
+| Earlier / later | Split the selected inclusive calendar range into two consecutive halves; an odd extra day belongs to the earlier half. Compare coverage and date bounds before interpreting differences. |
+| Energy vs skips | Pearson correlation across tracks with at least five known skip flags, comparing their energy with their skip rate. |
+| Energy vs repeats | Pearson correlation across scored tracks, comparing energy with `log(1 + event count)`. Repeated listening is not an independent experiment. |
+| New / familiar | First recorded local calendar day for a track versus later days, using the full archive for first-seen dates. |
+
+Correlations require at least three nonconstant points and describe associations only. Changing coverage, listening context, or track mix can change an average. Tempo estimates can be half/double the perceived beat. Lyrics sentiment, local audio analysis, genre inference, and release-date enrichment are outside this version.
 
 ## Screenshots
 
 Expand a view below for more examples, or click an image to see it at full size.
+
+<details>
+<summary>Musical mood and energy over time (fictional demo)</summary>
+
+![Monthly musical energy and valence, with smoothing and period drill-down controls](docs/screenshots/mood-energy.png)
+
+![Distribution of musical energy and valence, weighted by listening time with visible catalog coverage](docs/screenshots/mood-distribution.png)
+
+</details>
 
 <details>
 <summary>Artist mix over time and top favorites</summary>
@@ -135,7 +180,7 @@ Timestamps record when playback **ended**, in UTC. All duration is assigned to t
 
 Exact source records within the same audio/video category are deduplicated using a stable source-record fingerprint before personal fields are discarded. Records differing in source details are preserved. The web app uses a timestamp plus two compact hashes; Android uses SHA-256. These identifiers serve duplicate detection. Invalid timestamps and non-integer, negative, or out-of-range durations are excluded and counted. URI-less items are supported. Playback platform strings are grouped into broad device families; country codes reflect connection country, not an inferred home address.
 
-Genre, BPM, danceability, mood, track release dates, and true track durations are absent from this export. The app does not invent them or infer completion percentages from playback duration.
+Genre, BPM, danceability, mood, track release dates, and true track durations are absent from Spotify's export. Optional catalog enrichment adds only the fields returned by its provider. The app does not infer completion percentages or fill absent scores with zero.
 
 ## Development and validation
 
@@ -146,9 +191,9 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-`npm test` checks independent small fixtures for deduplication, privacy, weighted rates, DST/date filtering, discovery, calendar continuity, pagination, CSV injection protection, and correlation. Browser tests cover actual chart rendering and the import/filter/export experience. `npx tsx scripts/validate-local.ts` additionally reconciles your ignored local dataset across summaries, rankings, monthly/daily/hourly charts, and filtered history; its detailed output stays in `.private/`.
+`npm test` checks independent small fixtures for deduplication, privacy, weighted rates, DST/date filtering, discovery, calendar continuity, pagination, CSV injection protection, correlation, mood coverage/weighting/smoothing, exact-ID joins, metadata validation, and rate-limit handling. Browser tests cover chart rendering, metadata/history import, weighting, filters, export, persistence, and error recovery. `npx tsx scripts/generate-mood-fixtures.ts` regenerates the six shared native/web mood cases. `npx tsx scripts/validate-local.ts` additionally reconciles your ignored local dataset across summaries, rankings, monthly/daily/hourly charts, and filtered history; its detailed output stays in `.private/`.
 
-The frontend uses React, TypeScript, Vite, Recharts, and locally bundled icons. `src/lib/normalize.ts` owns import validation, `analytics.ts` owns calculations, and `worker.ts` keeps expensive parsing and aggregation off the UI thread. There is no application backend, telemetry, advertising, or third-party runtime asset dependency.
+The frontend uses React, TypeScript, Vite, Recharts, and locally bundled icons. `src/lib/normalize.ts` owns history validation, `analytics.ts` and `mood.ts` own calculations, `metadata.ts` owns the portable metadata contract, and `worker.ts` keeps parsing and aggregation off the UI thread. There is no application backend, telemetry, advertising, or third-party runtime asset dependency. Optional catalog fetching calls only `https://api.reccobeats.com` with track IDs; configure that origin in `connect-src` if your static host uses a Content Security Policy. Offline metadata imports work without API access.
 
 ## Static hosting
 

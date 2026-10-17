@@ -14,6 +14,10 @@ import com.caleb.spotifydash.core.Filters
 import com.caleb.spotifydash.core.HistoryPage
 import com.caleb.spotifydash.core.ImportBuilder
 import com.caleb.spotifydash.core.QueryResult
+import com.caleb.spotifydash.core.Metadata
+import com.caleb.spotifydash.core.MetadataCodec
+import com.caleb.spotifydash.core.MoodOptions
+import com.caleb.spotifydash.core.MoodResult
 import com.caleb.spotifydash.core.validateFilters
 import com.caleb.spotifydash.data.DatasetStore
 import kotlinx.coroutines.CancellationException
@@ -32,6 +36,7 @@ data class DashboardState(
     val meta: DatasetMeta? = null, val filters: Filters = Filters(), val result: QueryResult? = null,
     val history: HistoryPage = HistoryPage(), val historyOrder: String = "newest",
     val busy: Boolean = false, val busyText: String = "", val error: String? = null, val message: String? = null,
+    val mood: MoodResult? = null, val moodOptions: MoodOptions = MoodOptions(),
 )
 
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
@@ -41,6 +46,7 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val mutable = MutableStateFlow(DashboardState(busy = true, busyText = "Opening your history…"))
     val state: StateFlow<DashboardState> = mutable.asStateFlow()
     private var engine: Analytics? = null
+    private var metadata = Metadata()
     private var displayedFilters = Filters()
     private var queryJob: Job? = null
     private var operationJob: Job? = null
@@ -51,16 +57,18 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                 val loaded = withContext(worker) {
                     val data = store.load(); val filters = store.loadFilters()
                     val analytics = data?.let(::Analytics)
-                    Loaded(analytics, filters, analytics?.query(filters), analytics?.history(filters) ?: HistoryPage())
+                    val catalog = if (data?.meta?.source == "demo") MetadataCodec.demo(data) else store.loadMetadata() ?: Metadata()
+                    Loaded(analytics, filters, analytics?.query(filters), analytics?.history(filters) ?: HistoryPage(), catalog)
                 }
                 engine = loaded.analytics
+                metadata = loaded.metadata
                 displayedFilters = loaded.filters
                 mutable.value = DashboardState(loaded.analytics?.dataset?.meta, loaded.filters, loaded.result, loaded.history)
             } catch (e: Exception) { fail(e) }
         }
     }
 
-    private data class Loaded(val analytics: Analytics?, val filters: Filters, val result: QueryResult?, val history: HistoryPage)
+    private data class Loaded(val analytics: Analytics?, val filters: Filters, val result: QueryResult?, val history: HistoryPage, val metadata: Metadata = Metadata())
     private fun fail(e: Exception) {
         if (e is CancellationException) throw e
         mutable.update { it.copy(busy = false, busyText = "", error = e.message?.take(500) ?: "The operation could not be completed. Your previous history is unchanged.") }
@@ -91,10 +99,10 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                     coroutineContext.ensureActive()
                     val history = analytics.history(filters, order = order)
                     store.saveFilters(filters)
-                    query to history
+                    Triple(query, history, if (mutable.value.mood != null) analytics.mood(filters, metadata, mutable.value.moodOptions) else null)
                 }
                 displayedFilters = filters
-                mutable.update { it.copy(result = result.first, history = result.second, busy = false, busyText = "") }
+                mutable.update { it.copy(result = result.first, history = result.second, mood = result.third, busy = false, busyText = "") }
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 mutable.update { it.copy(filters = displayedFilters) }
@@ -164,12 +172,15 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
             val result = analytics.query(filters)
             val history = analytics.history(filters, order = order)
             store.save(data); store.saveFilters(filters)
-            Loaded(analytics, filters, result, history)
+            val catalog = if (old == null) Metadata() else metadata
+            if (old == null) store.saveMetadata(null)
+            Loaded(analytics, filters, result, history, catalog)
         }
         engine = loaded.analytics
+        metadata = loaded.metadata
         displayedFilters = loaded.filters
         mutable.update { it.copy(meta = loaded.analytics!!.dataset.meta, filters = loaded.filters, result = loaded.result, history = loaded.history,
-            busy = false, busyText = "", message = "History imported. ${loaded.analytics.dataset.events.size} events are ready to explore.") }
+            mood = null, busy = false, busyText = "", message = "History imported. ${loaded.analytics.dataset.events.size} events are ready to explore.") }
     }
 
     fun loadDemo() {
@@ -179,9 +190,11 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                 val data = store.demo(); val analytics = Analytics(data)
                 val result = analytics.query(filters); val history = analytics.history(filters)
                 store.save(data); store.saveFilters(filters)
-                Loaded(analytics, filters, result, history)
+                store.saveMetadata(null)
+                Loaded(analytics, filters, result, history, MetadataCodec.demo(data))
             }
             engine = loaded.analytics
+            metadata = loaded.metadata
             displayedFilters = filters
             mutable.value = DashboardState(loaded.analytics!!.dataset.meta, filters, loaded.result, loaded.history, message = "Fictional demo loaded. Import your files whenever you're ready.")
         }
@@ -191,6 +204,7 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         operate("Clearing saved history…") {
             withContext(worker) { store.clear() }
             engine = null
+            metadata = Metadata()
             displayedFilters = Filters()
             mutable.value = DashboardState(message = "Saved history cleared. Your original export files were not changed.")
         }
@@ -207,6 +221,49 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                 rows.size
             }
             mutable.update { it.copy(busy = false, busyText = "", message = "$count matching records exported to CSV.") }
+        }
+    }
+
+    fun requestMood(options: MoodOptions = mutable.value.moodOptions) {
+        if (mutable.value.busy || (mutable.value.mood != null && options == mutable.value.moodOptions)) return
+        val analytics = engine ?: return
+        operate("Calculating mood and energy…") {
+            val result = withContext(worker) { analytics.mood(mutable.value.filters, metadata, options) }
+            mutable.update { it.copy(mood = result, moodOptions = options, busy = false, busyText = "") }
+        }
+    }
+
+    fun importMetadata(uri: Uri) {
+        val analytics = engine ?: return
+        operate("Reading catalog metadata…") {
+            val result = withContext(worker) {
+                val next = requireNotNull(resolver.openInputStream(uri)) { "The metadata file could not be opened." }.bufferedReader().use { reader ->
+                    // Stream records, with a character limit independent of document-provider size reporting.
+                    var count = 0L
+                    val bounded = object : java.io.FilterReader(reader) {
+                        override fun read(buffer: CharArray, offset: Int, length: Int): Int {
+                            val n = super.read(buffer, offset, length); if (n > 0) count += n
+                            require(count <= 64L * 1024 * 1024) { "Metadata files must be smaller than 64 MB." }; return n
+                        }
+                    }
+                    MetadataCodec.read(bounded)
+                }
+                require(next.provider == if (analytics.dataset.meta.source == "demo") "demo" else "reccobeats") { "Demo metadata can only be used with the fictional demo." }
+                val merged = MetadataCodec.merge(metadata, next)
+                val mood = analytics.mood(mutable.value.filters, merged, mutable.value.moodOptions)
+                store.saveMetadata(merged)
+                merged to mood
+            }
+            metadata = result.first
+            mutable.update { it.copy(mood = result.second, busy = false, busyText = "", message = "${metadata.tracks.size} catalog records saved. Mood charts are ready offline.") }
+        }
+    }
+
+    fun exportMetadata(uri: Uri) {
+        if (mutable.value.busy || engine == null) return
+        operate("Exporting catalog metadata…") {
+            withContext(worker) { requireNotNull(resolver.openOutputStream(uri, "wt")) { "The export destination could not be opened." }.bufferedWriter().use { MetadataCodec.write(metadata, it) } }
+            mutable.update { it.copy(busy = false, busyText = "", message = "Portable metadata exported.") }
         }
     }
 }

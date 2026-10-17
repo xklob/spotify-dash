@@ -19,8 +19,8 @@ android {
         applicationId = "com.caleb.spotifydash"
         minSdk = 28
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.1.0"
+        versionCode = 2
+        versionName = "1.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true; buildConfig = true }
@@ -47,6 +47,7 @@ android {
     }
     testOptions { unitTests.isReturnDefaultValues = true }
     sourceSets["test"].resources.srcDir("../../tests/fixtures")
+    sourceSets["androidTest"].assets.srcDir("../../tests/fixtures")
     packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
 }
 kotlin { jvmToolchain(17) }

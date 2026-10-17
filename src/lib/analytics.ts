@@ -1,4 +1,6 @@
 import type { Dataset, Filters, GroupPoint, HistoryEvent, HistoryPage, QueryResult, Ranking } from './types';
+import { analyzeMood, type MoodOptions } from './mood';
+import { type Metadata } from './metadata';
 
 const DAY = 86400000;
 const HOUR = 3600000;
@@ -75,6 +77,13 @@ export class Analytics {
     return { rows: rows.slice(current * pageSize, (current + 1) * pageSize), total: rows.length, page: current, pages };
   }
   all(f: Filters) { return this.select(f); }
+
+  mood(f: Filters, metadata: Metadata, options: MoodOptions, pending = 0) {
+    const selected = this.select(f);
+    const start = f.start || this.prepared[0]?.date || '', end = f.end || this.prepared.at(-1)?.date || '';
+    if (start && end && Date.parse(end) - Date.parse(start) > DAY * 365 * 100) throw new Error('Choose a date range shorter than 100 years.');
+    return analyzeMood(selected, this.firstItem, metadata, options, start, end, pending);
+  }
 
   query(f: Filters): QueryResult {
     const selected = this.select(f);

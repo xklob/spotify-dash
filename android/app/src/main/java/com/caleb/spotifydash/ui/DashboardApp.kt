@@ -42,6 +42,7 @@ import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.RestartAlt
 import androidx.compose.material.icons.rounded.Science
 import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -177,6 +178,11 @@ private fun DashboardShell(state: DashboardState, model: DashboardViewModel) {
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
         if (uri != null) model.exportCsv(uri)
     }
+    val metadataLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) model.importMetadata(uri) }
+    val metadataExport = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri -> if (uri != null) model.exportMetadata(uri) }
+    LaunchedEffect(destination, state.busy, state.mood) {
+        if (destination == Destination.Mood && !state.busy && state.mood == null && state.error == null) model.requestMood()
+    }
 
     val actions = DashActions(
         setFilters = applyFilters,
@@ -193,6 +199,9 @@ private fun DashboardShell(state: DashboardState, model: DashboardViewModel) {
             exportLauncher.launch("spotify-dash-history_${scope?.start?.ifEmpty { null } ?: "start"}_to_${scope?.end?.ifEmpty { null } ?: "end"}.csv")
         },
         loadHistory = { page, order -> model.loadHistory(page, order) },
+        pickMetadata = { metadataLauncher.launch(JsonTypes) },
+        exportMetadata = { metadataExport.launch("spotify-dash-metadata.json") },
+        moodOptions = model::requestMood,
     )
 
     BackHandler(enabled = meta != null && destination != Destination.Overview) { destination = Destination.Overview }
@@ -403,6 +412,7 @@ private fun MainContent(
                     Destination.Favorites -> FavoritesScreen(env)
                     Destination.Habits -> HabitsScreen(env)
                     Destination.Discoveries -> DiscoveriesScreen(env)
+                    Destination.Mood -> MoodScreen(env)
                     Destination.History -> HistoryScreen(env)
                     Destination.Data -> Unit
                 }
@@ -520,8 +530,15 @@ private fun TopBar(destination: Destination, state: DashboardState, showWordmark
 @Composable
 private fun BottomNav(current: Destination, onSelect: (Destination) -> Unit) {
     val fontScale = LocalDensity.current.fontScale
+    var moreOpen by remember { mutableStateOf(false) }
+    val main = listOf(Destination.Overview, Destination.Favorites, Destination.Mood, Destination.History)
+    if (moreOpen) AlertDialog(onDismissRequest = { moreOpen = false }, title = { Text("More sections") }, text = {
+        Column { Destination.entries.filter { it !in main }.forEach { d ->
+            TextButton(onClick = { moreOpen = false; onSelect(d) }, modifier = Modifier.fillMaxWidth()) { Icon(d.icon, null); Spacer(Modifier.width(10.dp)); Text(d.title) }
+        } }
+    }, confirmButton = { TextButton(onClick = { moreOpen = false }) { Text("Close") } })
     NavigationBar(containerColor = Palette.BgSide, tonalElevation = 0.dp) {
-        Destination.entries.forEach { d ->
+        main.forEach { d ->
             NavigationBarItem(
                 selected = d == current,
                 onClick = { onSelect(d) },
@@ -549,6 +566,8 @@ private fun BottomNav(current: Destination, onSelect: (Destination) -> Unit) {
                 ),
             )
         }
+        NavigationBarItem(selected = current !in main, onClick = { moreOpen = true }, icon = { Icon(Icons.Rounded.MoreHoriz, null) }, modifier = Modifier.semantics { contentDescription = "More sections" }, label = if (fontScale < 1.3f) { { Text("More") } } else null,
+            colors = NavigationBarItemDefaults.colors(selectedIconColor = Palette.Accent, selectedTextColor = Palette.Text, indicatorColor = Palette.AccentWash, unselectedIconColor = Palette.Muted, unselectedTextColor = Palette.Muted))
     }
 }
 

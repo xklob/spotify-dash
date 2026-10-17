@@ -12,6 +12,7 @@ import { HabitsView } from './components/HabitsView';
 import { HistoryView, type HistoryRequest } from './components/HistoryView';
 import type { PickedFiles } from './components/ImportPanel';
 import { OverviewView } from './components/OverviewView';
+import { MoodView } from './components/MoodView';
 import { isTab, MobileHeader, Sidebar, TABS, type TabId } from './components/Shell';
 import { EmptyResult, Notice, Spinner } from './components/ui';
 import { Welcome } from './components/Welcome';
@@ -232,6 +233,8 @@ export default function App() {
     content = <HabitsView result={result} />;
   } else if (tab === 'discoveries') {
     content = <DiscoveriesView result={result} onArtist={filterArtist} onTitle={filterTitle} />;
+  } else if (tab === 'mood') {
+    content = <MoodView filters={filters} version={version} onFilters={updateFilters} onTitle={filterTitle} />;
   } else {
     content = (
       <HistoryView filters={filters} scope={result.scope} version={version} request={historyRequest} onRequest={setHistoryRequest}

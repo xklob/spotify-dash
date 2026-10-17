@@ -1,6 +1,6 @@
 {
   "name": "spotify-dash",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,7 +10,8 @@
     "start": "node scripts/serve.mjs",
     "import": "tsx scripts/import-history.ts",
     "test": "tsx --test tests/*.test.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "enrich": "tsx scripts/enrich-history.ts"
   },
   "engines": {
     "node": ">=22.12.0"

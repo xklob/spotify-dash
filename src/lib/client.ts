@@ -1,4 +1,5 @@
 import type { DatasetMeta, Filters, HistoryPage, QueryResult } from './types';
+import type { MoodOptions, MoodResult } from './mood';
 const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
 let nextId = 0;
 const pending = new Map<number, { resolve: (value: unknown) => void; reject: (reason: Error) => void; progress?: (message: string) => void }>();
@@ -26,3 +27,7 @@ export const query = (filters: Filters) => request<QueryResult>('query', [filter
 export const history = (filters: Filters, page = 0, pageSize = 50, order: 'newest' | 'oldest' = 'newest') => request<HistoryPage>('history', [filters, page, pageSize, order]);
 export const exportCsv = (filters: Filters) => request<string>('exportCsv', [filters]);
 export const clearData = () => request<void>('clearData');
+export const mood = (filters: Filters, options: MoodOptions) => request<MoodResult>('mood', [filters, options]);
+export const importMetadata = (file: File) => request<number>('importMetadata', [file]);
+export const exportMetadata = () => request<string>('exportMetadata');
+export const enrichBatch = () => request<{ completed: number; remaining: number }>('enrichBatch');

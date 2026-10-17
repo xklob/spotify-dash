@@ -1,5 +1,24 @@
 # Android validation
 
+## Version 1.2.0: musical mood and catalog metadata
+
+Version code 2. Built with Java 17 and Android SDK 36. Validation uses disposable Android 16 emulators; no physical-phone result is claimed.
+
+- Eight JVM tests pass, including six shared web/native mood scenarios. Hand-calculated fixtures verify time/event/distinct-track weighting, missing and zero scores, exact-ID joins, coverage denominators, calendar gaps, three-period distinct-track deduplication, DST boundaries, and incompatible or invalid metadata.
+- The web suite passes all 17 unit tests and five Chromium browser tests. Metadata/history import, export, persistence, errors, filter changes, smoothing, chart/table switches, desktop/mobile layout, and date drill-downs are covered. A live browser catalog check used only two GET requests containing track IDs; it sent no history or audio.
+- The native mood instrumentation flow passes metadata import, all nine chart sections, weighting changes, portable export, activity recreation, and invalid-import recovery. The navigation regression passes with all seven sections and the phone's More menu.
+- The signed, minified APK imports history and catalog metadata through Android's system file pickers. Its system Save picker exports a JSON file exactly equal to the five-record input fixture, proving portable field names survive release obfuscation. Scores and metadata survive force-stop and cold relaunch.
+- Phone, landscape, tablet, and 200% text layouts were inspected. Mood statistic tiles adapt to available width and text size. Chart selections show scores and coverage; numeric table alternatives remain available.
+- Release/debug builds and release lint pass. The APK inspection confirms version/package, the existing signing certificate, 16 KiB alignment, disabled backups, no network or broad storage permission, and the unchanged fictional demo asset. Public web assets contain no personal history or metadata payloads.
+
+The real-archive mood check runs under Android's normal 192 MiB heap and compares all three weightings against an independent Python calculation. It reconciles monthly, weekday/hour, annual, and distribution totals. Private data and detailed reports remain outside Git.
+
+`MoodUiTest` replaces only the disposable debug app's dataset with fictional fixtures. `DataDeviceTest#fullMoodArchiveWhenExplicitlyStaged` is opt-in via `-e moodArchive true`, and consumes an explicitly staged private archive, metadata cache, and independent expected totals. CI does not receive personal data.
+
+## Version 1.1.0 baseline
+
+The following checks established the original history explorer and remain the baseline for unchanged features.
+
 Version 1.1.0, version code 1. Validation uses Java 17, Android SDK 36, and an Android 16 emulator. No physical-phone result is claimed.
 
 ## Analysis parity
