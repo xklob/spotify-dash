@@ -48,7 +48,7 @@ class MoodUiTest {
                 assertEquals(5, store.loadMetadata()!!.tracks.size)
                 input.writeText("{\"format\":\"bad\"}")
                 scenario.onActivity { ViewModelProvider(it)[DashboardViewModel::class.java].importMetadata(Uri.fromFile(input)) }
-                compose.waitUntil(30_000) { compose.onAllNodesWithText("Operation could not be completed").fetchSemanticsNodes().isNotEmpty() || compose.onAllNodesWithText("Choose a Spotify Dash metadata JSON file (format version 1).").fetchSemanticsNodes().isNotEmpty() }
+                compose.waitUntil(30_000) { compose.onAllNodesWithText("Operation could not be completed").fetchSemanticsNodes().isNotEmpty() || compose.onAllNodesWithText("Choose a spotify dash metadata JSON file (format version 1).").fetchSemanticsNodes().isNotEmpty() }
                 assertEquals(5, store.loadMetadata()!!.tracks.size)
             }
         } finally { input.delete(); output.delete() }

@@ -15,7 +15,7 @@ export function Wordmark() {
   return (
     <span className="wordmark">
       <WaveGlyph />
-      <span className="wordmark-text">Spotify <b>Dash</b></span>
+      <span className="wordmark-text">spotify <b>dash</b></span>
     </span>
   );
 }

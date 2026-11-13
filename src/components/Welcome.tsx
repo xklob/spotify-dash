@@ -13,7 +13,7 @@ export function Welcome({ onPick, onDemo, busy }: { onPick: (picked: PickedFiles
         <p className="eyebrow">No history loaded</p>
         <h1 id="welcome-title">Open your Spotify Extended Streaming History</h1>
         <p className="welcome-lede">
-          Spotify Dash reads the <code>Streaming_History_*.json</code> files from your Spotify data download and turns them into
+          spotify dash reads the <code>Streaming_History_*.json</code> files from your Spotify data download and turns them into
           trends, favorites, habits, and a searchable record of every playback. Everything runs in this browser.
         </p>
         <ImportPanel onPick={onPick} disabled={busy} />

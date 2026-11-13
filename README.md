@@ -1,10 +1,10 @@
-# Spotify Dash
+# spotify dash
 
 Explore your entire Spotify Extended Streaming History in a web browser or the native Android app. Import your JSON files to explore listening trends, favorites, discovery, musical mood and energy, daily rhythms, and individual playback records. No Spotify API key or login is needed.
 
 **Your imported history stays on your device.** The web app processes data in a browser worker and remembers sanitized records in IndexedDB. Android processes and stores records locally in the app's private storage. Both discard IP addresses, usernames, and user-agent strings. Optional catalog fetching sends distinct Spotify track IDs to ReccoBeats; it does not send listening timestamps, counts, or history files. No local audio files are read, uploaded, or analyzed. Raw exports and imported datasets are excluded from the repository and production builds. The optional demo is fictional. The original web screenshots show the project owner's listening history, shared as examples; Mood & energy and Android screenshots use fictional demo data.
 
-![Spotify Dash overview with date and device filters, listening statistics, and a monthly listening chart](docs/screenshots/overview.png)
+![spotify dash overview with date and device filters, listening statistics, and a monthly listening chart](docs/screenshots/overview.png)
 
 ## Get your extended streaming history
 
@@ -23,7 +23,7 @@ If the download option is missing or the request does not arrive, see Spotify's 
 
 ## Android
 
-Install **Spotify Dash** through **Klobstore 0.1.5 or newer**, or download the signed APK from [GitHub Releases](https://github.com/xklob/spotify-dash/releases/latest). Requires Android 9 or newer.
+Install **spotify dash** through **klobstore 0.1.5 or newer**, or download the signed APK from [GitHub Releases](https://github.com/xklob/spotify-dash/releases/latest). Requires Android 9 or newer.
 
 The native app includes all seven sections, global filters, interactive charts, searchable rankings, playback details, and full filtered CSV export. Import JSON files or an extracted export folder through Android's file picker. It works offline and requests no network or broad storage permission. Import the portable catalog metadata file to unlock Mood & energy. Each device keeps its own history; there is no account sync. On phones, Habits, Discoveries, and Data & methods are under **More**.
 

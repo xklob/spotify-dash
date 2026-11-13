@@ -99,7 +99,7 @@ object MetadataCodec {
             else -> r.skipValue()
         }
         r.endObject()
-        require(r.peek() == JsonToken.END_DOCUMENT && format == "spotify-dash-metadata" && version == 1 && provider in listOf("reccobeats", "demo") && generated.isNotEmpty()) { "Choose a Spotify Dash metadata JSON file (format version 1)." }
+        require(r.peek() == JsonToken.END_DOCUMENT && format == "spotify-dash-metadata" && version == 1 && provider in listOf("reccobeats", "demo") && generated.isNotEmpty()) { "Choose a spotify dash metadata JSON file (format version 1)." }
         require(tracks.all { if (provider == "demo") it.uri.startsWith("demo:") else trackUri.matches(it.uri) }) { "Metadata has an invalid track identifier." }
         return Metadata(provider = provider, modelVersion = model, generatedAt = generated, tracks = tracks)
     }

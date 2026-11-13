@@ -24,4 +24,4 @@ const server = createServer((req, res) => {
   if (req.method === 'HEAD') { res.writeHead(200); res.end(); return; }
   createReadStream(file).pipe(res);
 });
-server.listen(port, '127.0.0.1', () => console.log(`Spotify Dash: http://localhost:${port}`));
+server.listen(port, '127.0.0.1', () => console.log(`spotify dash: http://localhost:${port}`));

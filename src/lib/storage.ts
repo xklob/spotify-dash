@@ -7,7 +7,7 @@ async function database(): Promise<IDBDatabase> {
     r.onupgradeneeded = () => r.result.createObjectStore('state');
     r.onsuccess = () => resolve(r.result);
     r.onerror = () => reject(new Error('Browser storage is unavailable. Your current session still works, but it may not survive a reload.'));
-    r.onblocked = () => reject(new Error('Close other Spotify Dash tabs to unlock browser storage.'));
+    r.onblocked = () => reject(new Error('Close other spotify dash tabs to unlock browser storage.'));
   });
 }
 async function read<T>(key: string): Promise<T | undefined> {

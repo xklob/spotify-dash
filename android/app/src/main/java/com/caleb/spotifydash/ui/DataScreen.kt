@@ -51,7 +51,7 @@ private val ExportSteps = listOf(
 )
 
 private val PrivacyPoints = listOf(
-    "Your files are read on this device and never uploaded. Spotify Dash has no internet access at all.",
+    "Your files are read on this device and never uploaded. spotify dash has no internet access at all.",
     "IP addresses, usernames, and device details are discarded while importing.",
     "The cleaned history stays in this app's private storage, outside device backups, until you delete it.",
     "Imported catalog metadata is also stored privately and cleared with your history. No local audio files are used.",
@@ -172,7 +172,7 @@ fun DataScreen(state: DashboardState, actions: DashActions, gutter: Dp, wide: Bo
                     }
                 }
                 ExternalLink("Spotify: Understanding your data", SpotifyDataUrl)
-                Caption("Spotify Dash is independent of Spotify and is not endorsed by Spotify.")
+                Caption("spotify dash is independent of Spotify and is not endorsed by Spotify.")
             }
         }
     }
@@ -237,7 +237,7 @@ fun WelcomeScreen(actions: DashActions, busy: Boolean, gutter: Dp, modifier: Mod
                     modifier = Modifier.semantics { heading() },
                 )
                 Text(
-                    "Spotify Dash turns the Streaming_History files from your Spotify data download into trends, favorites, habits, and a searchable record of every playback. Everything is analyzed on this device.",
+                    "spotify dash turns the Streaming_History files from your Spotify data download into trends, favorites, habits, and a searchable record of every playback. Everything is analyzed on this device.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Palette.Text2,
                 )
@@ -279,7 +279,7 @@ fun WelcomeScreen(actions: DashActions, busy: Boolean, gutter: Dp, modifier: Mod
             }
         }
         item(key = "fine") {
-            Caption("Spotify Dash is independent of Spotify and is not endorsed by Spotify.", Modifier.fillMaxWidth().padding(horizontal = 4.dp))
+            Caption("spotify dash is independent of Spotify and is not endorsed by Spotify.", Modifier.fillMaxWidth().padding(horizontal = 4.dp))
         }
     }
 }

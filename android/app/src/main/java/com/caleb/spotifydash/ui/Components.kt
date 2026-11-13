@@ -560,8 +560,8 @@ fun Wordmark(modifier: Modifier = Modifier) {
     Row(modifier.semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         WaveGlyph()
         Row {
-            Text("Spotify ", style = MaterialTheme.typography.titleMedium, color = Palette.Text)
-            Text("Dash", style = MaterialTheme.typography.titleMedium, color = Palette.Accent)
+            Text("spotify ", style = MaterialTheme.typography.titleMedium, color = Palette.Text)
+            Text("dash", style = MaterialTheme.typography.titleMedium, color = Palette.Accent)
         }
     }
 }

@@ -1,10 +1,10 @@
-# Spotify Dash for Android
+# spotify dash for Android
 
 Native Kotlin and Jetpack Compose explorer for Spotify Extended Streaming History. Android 9 or newer. The app uses the same metric definitions as the web dashboard, with native charts, navigation, file selection, and CSV export.
 
 ## Install and import
 
-1. Install **Spotify Dash** from Klobstore, or download the signed `.apk` from [GitHub Releases](https://github.com/xklob/spotify-dash/releases/latest).
+1. Install **spotify dash** from klobstore, or download the signed `.apk` from [GitHub Releases](https://github.com/xklob/spotify-dash/releases/latest).
 2. [Request your Extended Streaming History](../README.md#get-your-extended-streaming-history), download the ZIP, and extract it. Transfer the extracted JSON files to the phone if you downloaded them on a computer.
 3. Open the app and tap **Choose JSON files** or **Choose export folder**. Select every audio/video JSON part from the export. The Android file picker grants access only to the selected files or folder.
 4. Explore the seven sections, adjust global filters, and save all matching playback records as CSV from History. On phones, **More** opens Habits, Discoveries, and Data & methods. A fictional demo is available before importing your own data.
@@ -77,4 +77,4 @@ SPOTIFY_DASH_SIGNING_PROPERTIES=/private/path/signing.properties \
   ./gradlew assembleRelease lintRelease
 ```
 
-Publish a standalone signed APK, retain the same certificate for updates, and increase `versionCode`. Klobstore reads the package version and signing certificate from the APK; the web release ZIP does not affect Android update detection.
+Publish a standalone signed APK, retain the same certificate for updates, and increase `versionCode`. klobstore reads the package version and signing certificate from the APK; the web release ZIP does not affect Android update detection.

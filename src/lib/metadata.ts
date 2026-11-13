@@ -25,7 +25,7 @@ export function featureValue(key: Feature, v: unknown): number | null {
 }
 export function validateMetadata(value: unknown): Metadata {
   const m = object(value);
-  if (m.format !== 'spotify-dash-metadata' || m.version !== 1 || !['reccobeats', 'demo'].includes(String(m.provider)) || !Array.isArray(m.tracks) || m.tracks.length > 100000) throw new Error('Choose a Spotify Dash metadata JSON file (format version 1).');
+  if (m.format !== 'spotify-dash-metadata' || m.version !== 1 || !['reccobeats', 'demo'].includes(String(m.provider)) || !Array.isArray(m.tracks) || m.tracks.length > 100000) throw new Error('Choose a spotify dash metadata JSON file (format version 1).');
   const date = (v: unknown) => { if (typeof v !== 'string' || !Number.isFinite(Date.parse(v))) throw new Error('Metadata has an invalid retrieval date.'); return new Date(v).toISOString(); };
   const seen = new Set<string>();
   const tracks = m.tracks.map(raw => {

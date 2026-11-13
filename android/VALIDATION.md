@@ -64,3 +64,9 @@ cd android
 ```
 
 Timing measurements are emulator observations, not performance guarantees for every phone. The app keeps Android and browser datasets separate and supports extracted JSON files, not ZIP import or account sync.
+
+## 1.2.1: lowercase branding
+
+spotify dash now uses lowercase branding in its Android launcher and wordmark, browser wordmark, page title and help text. The app keeps the existing package and signing identity, saved history and metadata formats.
+
+Android versionCode 3. Validation: 8 JVM tests passed (one optional full-data benchmark skipped), all 17 web tests, TypeScript/production build, public-asset privacy inspection, debug/release lint and builds passed. The signed APK matches the v1.2.0 certificate and passes 16 KiB alignment. Its bundled data remains the fictional demo; it requests neither Internet nor broad storage access.
